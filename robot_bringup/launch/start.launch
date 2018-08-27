@@ -1,0 +1,5 @@
+<launch>
+   <include file="$(find rplidar_ros)/launch/rplidar.launch" />
+   <include file="$(find ros_arduino_python)/launch/arduino.launch" />
+   <node name="baselink2baselaser" pkg="tf" type="static_transform_publisher" args="0 0 0 0 0 0 base_link base_laser 100" />
+</launch>

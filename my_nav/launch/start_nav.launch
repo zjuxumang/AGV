@@ -1,0 +1,8 @@
+<launch>
+    <include file="$(find my_nav)/launch/move_base.launch" />
+    <include file="$(find my_nav)/launch/amcl.launch" />
+
+    <node pkg="my_nav" type="cruise_nav.py" name="cruise_nav" output="screen">
+        <!--param name=""  value=""/-->
+    </node>
+</launch>
