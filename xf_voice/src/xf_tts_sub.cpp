@@ -16,7 +16,7 @@
 #include "msp_errors.h"
 
 const char* fileName="./voice.wav";
-const char* playPath="mplayer ./voice.wav";
+const char* playPath="play ./voice.wav";
 
 /* wav音频头部格式 */
 typedef struct _wave_pcm_hdr
