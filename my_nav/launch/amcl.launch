@@ -1,6 +1,6 @@
 <launch>
   <!-- startup rviz node to show amcl process -->
-  <node name="amcl_rviz" type="rviz" pkg="rviz"/>
+  <!-- node name="amcl_rviz" type="rviz" pkg="rviz"/ -->
  
   <!-- load map -->
   <node name="map_server" pkg="map_server" type="map_server" args="$(find my_nav)/maps/mymap.yaml" />
