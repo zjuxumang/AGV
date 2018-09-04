@@ -5,20 +5,29 @@
 import rospy
 from std_msgs.msg import String
 
+def callback(data):
+    '''text_send Callback Function'''
+    if(data.data=='B'):
+        pub.publish("进入通知巡游播报模式")
+        talker()
+    elif data.data=='\x09':
+        pub.publish("退出客户端")
+    elif data.data=='\x08':
+        pub.publish("客户端启动成功")
+
 def talker():
-    '''text_send Publisher'''
-    pub = rospy.Publisher('voice/xf_tts_topic', String, queue_size=10)
-    rospy.init_node('text_send', anonymous=True)
-    rate = rospy.Rate(1) # 10hz
     hello_str = "你好"
     rospy.loginfo(hello_str)
-    pub.publish(hello_str)
-    rate.sleep()
     pub.publish(hello_str)
 
 if __name__ == '__main__':
     try:
-        talker()
+        '''text_send Publisher'''
+        pub = rospy.Publisher('voice/xf_tts_topic', String, queue_size=10)
+        rospy.Subscriber("current_cmd", String, callback)
+        rospy.init_node('text_send', anonymous=True)
+        rospy.sleep(0.3)
+        
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
