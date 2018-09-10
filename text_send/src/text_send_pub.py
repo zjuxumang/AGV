@@ -5,19 +5,16 @@
 import rospy
 from std_msgs.msg import String
 
-def talker():
-    '''text_send Publisher'''
-    pub = rospy.Publisher('voice/xf_tts_topic', String, queue_size=10)
-    rospy.init_node('text_send', anonymous=True)
-    rospy.sleep(1)
-    hello_str = "多功能社区服务车启动成功"
-    rospy.loginfo(hello_str)
-    pub.publish(hello_str)
-
+def callback(data):
+    '''text_send Callback Function'''
 
 if __name__ == '__main__':
     try:
-        talker()
+        '''text_send Publisher'''
+        rospy.Subscriber("current_cmd", String, callback)
+        rospy.init_node('text_send', anonymous=True)
+        rospy.sleep(0.3)
+        
         rospy.spin()
     except rospy.ROSInterruptException:
         pass
