@@ -5,16 +5,19 @@
 from __future__ import print_function
 #import roslib; roslib.load_manifest('nav_cmd')
 import rospy
+import os
 from std_msgs.msg import Int32
 from std_msgs.msg import String
+from std_srvs.srv import *
 from geometry_msgs.msg import Twist
 import sys, select, termios , tty
 
 msg = """
+多功能社区服务车控制系统
 请通过键盘发送指令
 -------------------
-A 启动送餐路线1
-S 启动送餐路线2
+S 启动服务车
+M 开始地图构建
 D 启动送餐路线3
 B 启动通知巡游播报
 Y 键盘遥控模式
@@ -29,26 +32,91 @@ def getKey():
     termios.tcsetattr(sys.stdin,termios.TCSADRAIN,settings)
     return key
 
+msg_teleop = """
+按下列键控制服务车移动，按d退出
+---------------------------
+   u    i    o
+   j    k    l
+   m    ,    .
+---------------------------
+"""
+
+moveBindings = {
+		'i':(1,0,0,0),
+		'o':(1,0,0,-1),
+		'j':(0,0,0,1),
+		'l':(0,0,0,-1),
+		'u':(1,0,0,1),
+		',':(-1,0,0,0),
+		'.':(-1,0,0,1),
+		'm':(-1,0,0,-1)
+	       }
+
+def teleop_twist_keyboard():
+    os.system('clear')
+    pub_vel = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+    print(msg_teleop)
+    speed = 0.13
+    turn = 1.0
+    while(1):
+        key = getKey()
+        if key in moveBindings.keys():
+            x = moveBindings[key][0]
+            y = moveBindings[key][1]
+            z = moveBindings[key][2]
+            th = moveBindings[key][3]
+        else:
+            x = 0
+            y = 0
+            z = 0
+            th = 0
+            if (key == 'd'):
+                break
+
+        twist = Twist()
+        twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed
+        twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
+        pub_vel.publish(twist)
+
 if __name__ == '__main__':
     settings = termios.tcgetattr(sys.stdin)
 
     pub = rospy.Publisher('current_cmd', String, queue_size=10)
-    pub_twist = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
     rospy.init_node('nav_cmd', anonymous=True)
+    rate=rospy.Rate(10)
 
     try:
         print(msg)
         pub.publish('\x08') #客户端启动
         while(1):
             key=getKey()
-            if key == 'A':
-                print("cmd=A")
-            elif key == 'B':
-                print("cmd=B")
+            if key == 'S':
+                print("服务车启动中........")
+                try:
+                    rospy.wait_for_service('is_running',5)
+                    is_running = rospy.ServiceProxy('is_running', SetBool)
+                    resp = is_running(True)
+                    if resp.success == True:
+                        print("启动成功！")  
+                except:
+                    print("启动失败，请检查电源后重试！")               
+            elif key == 'M':
+                print("gmapping启动中........")
+                #os.system('rosrun rviz rviz &')
+                teleop_twist_keyboard()
+                print("地图保存中........")
+                rospy.sleep(2)
+                print("完成！")
+                print(msg)
+            elif key == 'Y':
+                teleop_twist_keyboard()
+                os.system('clear')
+                print("退出遥控模式")
+                print(msg)
             else:
-                print("unkown cmd")
                 if(key== '\x03'):
                     break
+                print("unkown cmd")
 
             cmd=String()
             cmd.data=key

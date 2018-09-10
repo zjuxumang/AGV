@@ -30,6 +30,7 @@ from geometry_msgs.msg import Quaternion, Twist, Pose
 from nav_msgs.msg import Odometry
 from std_msgs.msg import Int32
 from tf.broadcaster import TransformBroadcaster
+from std_srvs.srv import SetBool
  
 """ Class to receive Twist commands and publish Odometry data """
 class BaseController:
@@ -113,7 +114,10 @@ class BaseController:
         
         rospy.loginfo("Started base controller for a base of " + str(self.wheel_track) + "m wide with " + str(self.encoder_resolution) + " ticks per rev")
         rospy.loginfo("Publishing odometry data at: " + str(self.rate) + " Hz using " + str(self.base_frame) + " as base frame")
-
+        s = rospy.Service('is_running', SetBool, is_running)
+    
+    def is_running(req):
+        return [True, "is running"]    
 
     def setup_pid(self, pid_params):
         # Check to see if any PID parameters are missing
