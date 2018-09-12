@@ -13,14 +13,13 @@ from geometry_msgs.msg import Twist
 import sys, select, termios , tty
 
 msg = """
-多功能社区服务车控制系统
+多功能社区服务车控制系统 v1.0
 请通过键盘发送指令
 ----------------------------------------
-S 启动服务车         G 激光雷达启动/停止扫描
+S 启动主控程序       G 激光雷达启动/停止扫描
 M 开始地图构建       N 启动导航图形界面
-D 启动送餐路线3
-B 启动通知巡游播报
-Y 键盘遥控模式
+D 启动送餐路线       B 启动通知巡游播报
+Y 键盘遥控模式       R 重启系统
 ----------------------------------------
 
 按CTRL+C退出
@@ -77,7 +76,7 @@ def teleop_twist_keyboard():
         twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed
         twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
         pub_vel.publish(twist)
-
+is_reboot=0
 if __name__ == '__main__':
     settings = termios.tcgetattr(sys.stdin)
 
@@ -88,7 +87,7 @@ if __name__ == '__main__':
     os.system('clear')
     try:
         print(msg)
-        while(1):
+        while not rospy.is_shutdown():
             key=getKey()
             if key == 's':
                 pub.publish('s')
@@ -141,6 +140,11 @@ if __name__ == '__main__':
                 else:
                     os.system('rosservice call /start_motor')
                     motor_flag=1
+            elif key == 'r':
+                print("系统重启中.............")
+                is_reboot=1
+                pub.publish('r')
+                print("按任意键继续")
             else:
                 if(key== '\x03'):
                     break
@@ -149,5 +153,7 @@ if __name__ == '__main__':
     except rospy.ROSInterruptException:
         pass
     finally:
-        print("退出控制客户端......")
-        pub.publish('\x09')
+        if is_reboot == 1:
+            os.system('rosrun my_nav nav_cmd_pub.py')
+        else:
+            print("退出控制客户端......")
