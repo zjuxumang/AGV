@@ -15,13 +15,13 @@ import sys, select, termios , tty
 msg = """
 多功能社区服务车控制系统
 请通过键盘发送指令
--------------------
-S 启动服务车
-M 开始地图构建
+----------------------------------------
+S 启动服务车         G 激光雷达启动/停止扫描
+M 开始地图构建       N 启动导航图形界面
 D 启动送餐路线3
 B 启动通知巡游播报
 Y 键盘遥控模式
--------------------
+----------------------------------------
 
 按CTRL+C退出
 """
@@ -84,43 +84,68 @@ if __name__ == '__main__':
     pub = rospy.Publisher('current_cmd', String, queue_size=10)
     rospy.init_node('nav_cmd', anonymous=True)
     rate=rospy.Rate(10)
-
+    motor_flag=1
+    os.system('clear')
     try:
         print(msg)
-        pub.publish('\x08') #客户端启动
         while(1):
             key=getKey()
-            if key == 'S':
+            if key == 's':
+                pub.publish('s')
                 print("服务车启动中........")
                 try:
-                    rospy.wait_for_service('is_running',5)
-                    is_running = rospy.ServiceProxy('is_running', SetBool)
-                    resp = is_running(True)
+                    rospy.wait_for_service('is_running',30)
+                    is_running = rospy.ServiceProxy('is_running', Trigger)
+                    resp = is_running()
                     if resp.success == True:
                         print("启动成功！")  
                 except:
-                    print("启动失败，请检查电源后重试！")               
-            elif key == 'M':
+                    print("启动失败，请检查电源后重试！")     
+                is_running.close()
+            elif key == 'm':
+                pub.publish('m')
                 print("gmapping启动中........")
-                #os.system('rosrun rviz rviz &')
+                os.system('rosrun rviz rviz >/dev/null &')
                 teleop_twist_keyboard()
-                print("地图保存中........")
-                rospy.sleep(2)
-                print("完成！")
+                while(1):
+                    print("按s保存地图，按c放弃保存并退出")
+                    key=getKey()
+                    if key == 's':
+                        pub.publish('savemap')
+                        print("地图保存中........")
+                        rospy.sleep(5)
+                        print("完成！")
+                        rospy.sleep(2)
+                        break
+                    elif key == 'c':
+                        pub.publish('exitgmapping')
+                        print('退出')
+                        rospy.sleep(2)
+                        break
+                    else: 
+                        pass
+                os.system("clear")
                 print(msg)
-            elif key == 'Y':
+            elif key == 'n':
+                pub.publish('n')
+                os.system('rosrun rviz rviz >/dev/null &')
+            elif key == 'y':
                 teleop_twist_keyboard()
                 os.system('clear')
                 print("退出遥控模式")
                 print(msg)
+            elif key == 'g':
+                if motor_flag==1:
+                    os.system('rosservice call /stop_motor')
+                    motor_flag=0
+                else:
+                    os.system('rosservice call /start_motor')
+                    motor_flag=1
             else:
                 if(key== '\x03'):
                     break
                 print("unkown cmd")
 
-            cmd=String()
-            cmd.data=key
-            pub.publish(cmd)
     except rospy.ROSInterruptException:
         pass
     finally:

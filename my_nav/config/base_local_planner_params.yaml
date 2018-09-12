@@ -9,14 +9,14 @@ TrajectoryPlannerROS:
  acc_lim_theta: 2 #最大角加速度
  acc_lim_x: 0.2 #x轴方向最大加速度
  escape_vel: -0.13
- pdist_scale: 0.5
- gdist_scale: 0.8
+ pdist_scale: 0.6
+ gdist_scale: 0.5
  dwa: true
 
  sim_tim: 1.0
  yaw_goal_tolerance: 0.1
  xy_goal_tolerance: 0.05
- occidst_scale: 0.005
+ occidst_scale: 0.0002
  heading_scoring: false
  meter_scoring: true
 
