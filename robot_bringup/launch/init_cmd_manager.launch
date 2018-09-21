@@ -1,3 +1,0 @@
-<launch>
-    <node name="cmd_manager" pkg="robot_bringup" type="cmd_manager_sub.py" respawn="true"/>
-</launch>

@@ -5,7 +5,7 @@ import rospy
 import os
 from std_msgs.msg import String
 from std_srvs.srv import *
-is_mb_running=0
+
 def callback(cmd):
     '''cmd_manager Callback Function'''
     if cmd.data == 's':
@@ -20,10 +20,7 @@ def callback(cmd):
     elif cmd.data == 'exitgmapping':                            #退出gmapping不保存
         os.system('rosnode kill /slam_gmapping')
     elif cmd.data =='n':                                        #启动导航包
-        if is_mb_running == 0:
-            is_mb_running=1
-        else:
-            os.system('~/catkin_ws/src/my_nav/scripts/exit.sh') #如果导航包已经在运行，则先退出再重启
+        os.system('~/catkin_ws/src/my_nav/scripts/exit.sh') #如果导航包已经在运行，则先退出再重启
         os.system('roslaunch my_nav start_nav.launch &')
         os.system('play ~/catkin_ws/nav_startup.wav')
     elif cmd.data == 'r':
@@ -38,4 +35,5 @@ def listener():
     rospy.spin()
 
 if __name__ == '__main__':
+    is_mb_running=0
     listener()

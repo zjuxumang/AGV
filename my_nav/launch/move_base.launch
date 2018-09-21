@@ -5,7 +5,7 @@
     <rosparam file="$(find my_nav)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find my_nav)/config/local_costmap_params.yaml"  command="load" />
     <rosparam file="$(find my_nav)/config/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find my_nav)/config/base_local_planner_params.yaml"    command="load" />
+    <rosparam file="$(find my_nav)/config/dwa_local_planner_params.yaml"    command="load" />
     <rosparam file="$(find my_nav)/config/move_base_params.yaml"            command="load" />
     <rosparam file="$(find my_nav)/config/global_planner_params.yaml"       command="load" />
 

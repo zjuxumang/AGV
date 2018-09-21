@@ -76,7 +76,7 @@ void publish_scan(ros::Publisher *pub,
  
     scan_msg.scan_time = scan_time;
     scan_msg.time_increment = scan_time / (double)(node_count-1);
-    scan_msg.range_min = 0.15;
+    scan_msg.range_min = 0.05;
     scan_msg.range_max = max_distance;
  
     scan_msg.intensities.resize(node_count);
@@ -201,7 +201,7 @@ int main(int argc, char * argv[]) {
     std::string frame_id;
     bool inverted = false;
     bool angle_compensate = true;
-    float max_distance = 8.0;
+    float max_distance = 5.0;
     int angle_compensate_multiple = 1;//it stand of angle compensate at per 1 degree
     int left_degrees,right_degrees;
     bool cut_angle;

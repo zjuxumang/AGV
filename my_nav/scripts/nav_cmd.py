@@ -145,6 +145,8 @@ if __name__ == '__main__':
                 is_reboot=1
                 pub.publish('r')
                 print("按任意键继续")
+            elif key == 'd':
+                os.system('roslaunch my_nav patrol_nav.launch')
             else:
                 if(key== '\x03'):
                     break
@@ -154,6 +156,6 @@ if __name__ == '__main__':
         pass
     finally:
         if is_reboot == 1:
-            os.system('rosrun my_nav nav_cmd_pub.py')
+            os.system('rosrun my_nav nav_cmd.py')
         else:
             print("退出控制客户端......")
