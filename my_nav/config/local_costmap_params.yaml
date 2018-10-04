@@ -1,13 +1,13 @@
 local_costmap:
   global_frame: /odom
   robot_base_frame: /base_link
-  update_frequency: 2.5
+  update_frequency: 1.0
   publish_frequency: 1.0
   static_map: false
   rolling_window: true
   width: 0.6
   height: 0.6
-  resolution: 0.02
+  resolution: 0.03
   transform_tolerance: 2.0
   plugins:
     - {name: obstacle_layer,  type: "costmap_2d::ObstacleLayer"}

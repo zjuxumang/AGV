@@ -146,7 +146,12 @@ if __name__ == '__main__':
                 pub.publish('r')
                 print("按任意键继续")
             elif key == 'd':
-                os.system('roslaunch my_nav patrol_nav.launch')
+                os.system('roslaunch my_nav patrol_nav_delivery.launch')
+            elif key == 'c':
+                os.system('rosnode kill /move_base')
+                print("move_base has been killed")
+            elif key == 'b':
+                os.system('roslaunch my_nav patrol_nav_advertise.launch')
             else:
                 if(key== '\x03'):
                     break

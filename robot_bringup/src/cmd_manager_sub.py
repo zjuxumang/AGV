@@ -25,6 +25,22 @@ def callback(cmd):
         os.system('play ~/catkin_ws/nav_startup.wav')
     elif cmd.data == 'r':
         os.system('rosnode kill -a')
+    elif cmd.data == 'd':
+        os.system('play ~/catkin_ws/line1.wav')
+    elif cmd.data == 'b':
+        os.system('play ~/catkin_ws/ad_startup.wav')
+    elif cmd.data == '1':
+        os.system('play ~/catkin_ws/arrive1.wav')
+    elif cmd.data == '2':
+        os.system('play ~/catkin_ws/arrive2.wav')
+    elif cmd.data == '3':
+        os.system('play ~/catkin_ws/arrive3.wav')
+    elif cmd.data == '4':
+        os.system('play ~/catkin_ws/arrive4.wav')
+    elif cmd.data == '5':
+        os.system('play ~/catkin_ws/arrive5.wav')
+    elif cmd.data == "adv":
+        os.system('play ~/catkin_ws/adv1.wav')
 def listener():
     '''cmd_manager Subscriber'''
     rospy.init_node('cmd_manager')

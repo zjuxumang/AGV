@@ -1,4 +1,4 @@
 <launch>
-    <include file="$(find my_nav)/launch/move_base.launch" />
     <include file="$(find my_nav)/launch/amcl.launch" />
+    <include file="$(find my_nav)/launch/move_base.launch" />
 </launch>

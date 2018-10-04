@@ -22,6 +22,7 @@
 import rospy
 import random
 import actionlib
+from std_msgs.msg import String
 from actionlib_msgs.msg import *
 from geometry_msgs.msg import Pose, Point, Quaternion
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
@@ -31,7 +32,7 @@ class PatrolNav():
     def __init__(self):
         rospy.init_node('patrol_nav_node', anonymous=False)
         rospy.on_shutdown(self.shutdown)
- 
+        pub = rospy.Publisher('current_cmd', String, queue_size=10)
         # From launch file get parameters
         self.rest_time     = rospy.get_param("~rest_time", 5)
         self.keep_patrol   = rospy.get_param("~keep_patrol",   False)
@@ -39,14 +40,16 @@ class PatrolNav():
         self.patrol_type   = rospy.get_param("~patrol_type", 0)
         self.patrol_loop   = rospy.get_param("~patrol_loop", 2)
         self.patrol_time   = rospy.get_param("~patrol_time", 5)
+        self.advertise     = rospy.get_param("~advertise", False)
  
         #set all navigation target pose
         self.locations = dict()
-        self.locations['one']   = Pose(Point(0.1,  0.55, 0.000), Quaternion(0.000, 0.000, 0.705, 0.708))
-        self.locations['two']   = Pose(Point(0.688,  0.837, 0.000), Quaternion(0.000, 0.000, 0.000,  1.000))
-        self.locations['three'] = Pose(Point(1.38,  0.563, 0.000), Quaternion(0.000, 0.000, 1.000, 0.000))
-        self.locations['four']  = Pose(Point(1.388, 0.098, 0.000), Quaternion(0.000, 0.000, -0.698, 0.716))
-        self.locations['five']  = Pose(Point(0.231, 0.000, 0.000), Quaternion(0.000, 0.000, 1.000, 0.000))
+        self.locations['one']   = Pose(Point(0.23,  0.49, 0.000), Quaternion(0.000, 0.000, 0.00, 1.0))
+        self.locations['two']   = Pose(Point(0.514, -0.08, 0.000), Quaternion(0.000, 0.000, 0.000,  1.000))
+        self.locations['three'] = Pose(Point(1.49,  0.023, 0.000), Quaternion(0.000, 0.000, 0.7, 0.7))
+        self.locations['four']  = Pose(Point(1.52, 0.63, 0.000), Quaternion(0.000, 0.000, 0.71, 0.71))
+        self.locations['five']  = Pose(Point(0.71, 0.64, 0.000), Quaternion(0.000, 0.000, -0.7, 0.7))
+        self.locations['six']  = Pose(Point(0.0, 0.0, 0.000), Quaternion(0.000, 0.000, 0.0, 1.0))
  
         # Goal state return values
         goal_states = ['PENDING', 'ACTIVE', 'PREEMPTED', 'SUCCEEDED', 'ABORTED',
@@ -100,7 +103,7 @@ class PatrolNav():
             n_goals    += 1
  
             # Allow 5 minutes to get there
-            finished_within_time = self.move_base.wait_for_result(rospy.Duration(30))
+            finished_within_time = self.move_base.wait_for_result(rospy.Duration(60))
             # Check for success or failure
             if not finished_within_time:
                 self.move_base.cancel_goal()
@@ -110,11 +113,16 @@ class PatrolNav():
                 if state == GoalStatus.SUCCEEDED:
                     n_successes += 1
                     rospy.loginfo("Goal succeeded!")
+                    if self.advertise == False:
+                        pub.publish(str(n_successes))
                 else:
                     rospy.logerr("Goal failed with error code:"+str(goal_states[state]))
  
             # How long have we been running?
             running_time = rospy.Time.now() - start_time
+            if self.advertise:
+                if running_time.secs>15:
+                    pub.publish("adv")
             running_time = running_time.secs/60.0
  
             # Print a summary success/failure and time elapsed
@@ -127,7 +135,7 @@ class PatrolNav():
             if self.keep_patrol == False and self.patrol_type == 1: #use patrol_time
                 if running_time >= self.patrol_time:
                     rospy.logwarn("Now reach patrol_time, back to original position...")
-                    self.send_goal('six')
+                    self.send_goal('five')
                     rospy.signal_shutdown('Quit')
  
     def send_goal(self, locate):
