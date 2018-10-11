@@ -105,7 +105,7 @@ if __name__ == '__main__':
             elif key == 'm':
                 pub.publish('m')
                 print("gmapping启动中........")
-                os.system('rosrun rviz rviz >/dev/null &')
+                os.system('rosrun rviz rviz -d catkin_ws/src/my_nav/rviz/gmapping.rviz >/dev/null &')
                 teleop_twist_keyboard()
                 while(1):
                     print("按s保存地图，按c放弃保存并退出")
@@ -128,7 +128,7 @@ if __name__ == '__main__':
                 print(msg)
             elif key == 'n':
                 pub.publish('n')
-                os.system('rosrun rviz rviz >/dev/null &')
+                os.system('rosrun rviz rviz -d catkin_ws/src/my_nav/rviz/nav.rviz >/dev/null &')
             elif key == 'y':
                 teleop_twist_keyboard()
                 os.system('clear')
